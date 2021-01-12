@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,12 +8,26 @@ using System.Threading;
 
 namespace ConsoleApplication8
 {
-    internal class Program
+
+    public class Program
     {
-        private static void Main(string[] args)
+        public class Bullet
         {
+            public int x;
+            public int y;
+            public Bullet(int x, int y)
+            {
+                this.x = x;
+                this.y = y;
+            }
+        }
+
+        public static void Main(string[] args)
+        {
+
+            List<Bullet> bullets = new List<Bullet>();
+
             
-            //variables
             int maxscore = 0,
                 count = 0,
                 speed = 0,
@@ -21,24 +35,21 @@ namespace ConsoleApplication8
 
             int PlayerX = 20,
                 PlayerY = 40,
-                Shoot1X = 0,
-                Shoot1Y = 0,
                 Enemy1Y = int.MinValue,
                 Enemy1X = 0;
 
-            bool CanShoot = true;
-                 
+
 
             Random rand = new Random();
 
-            //game initialization
-            Console.SetWindowSize(40, 40);
+
+            Console.SetWindowSize(40, 60);
             Console.SetCursorPosition(PlayerX, PlayerY);
             Console.WriteLine("@");
 
-            //moving
             while (true)
             {
+                //int k=0;
                 if (Console.KeyAvailable)
                 {
                     ConsoleKeyInfo keyPressed = Console.ReadKey(true);
@@ -62,34 +73,64 @@ namespace ConsoleApplication8
                     }
                     if (keyPressed.Key == ConsoleKey.UpArrow)
                     {
-                        if (CanShoot == true)
-                        {
-                            Shoot1X = PlayerX;
-                            Shoot1Y = PlayerY + 5;
-                            CanShoot = false;
-                        }
-                        
+
+
+                        bullets.Add(new Bullet(PlayerX, PlayerY)); 
+
 
                     }
                 }
-                //shoot
-                if (CanShoot == false)
+
+
+                for (int g = 0; g < bullets.Count; g++)
                 {
-                    Console.SetCursorPosition(Shoot1X, Shoot1Y);
-                    Console.WriteLine("*");
-                    if (Shoot1Y != 0)
-                        Shoot1Y -= 1;
+                    //Console.SetCursorPosition(0, 50);
+                    //Console.WriteLine(bullets.Count);
+
+                    if (bullets[g].y > 0)
+                    {
+                        Console.SetCursorPosition(bullets[g].x, bullets[g].y);
+                        bullets[g].y -= 1;
+                        Console.WriteLine("*");
+                    }
                     else
                     {
-                        CanShoot = true;
+                        bullets.RemoveAt(g);
+                        g--;
+                    }
+
+                }
+                for (int i = 0; i <= 6; i++)
+                {
+                    for (int g = 0; g < bullets.Count; g++)
+                    {
+                        if (PlayerY == Enemy1X)
+                        {
+                            if (PlayerX == Enemy1Y + i || PlayerX + 1 == Enemy1Y + i || PlayerX + 2 == Enemy1Y + i || PlayerX + 3 == Enemy1Y + i || PlayerX + 4 == Enemy1Y + i)
+                            {
+                                count = 0;
+                                speed = 0;
+                                break;
+                            }
+                        }
+                        if (g >= 0 && g <= bullets.Count)
+                        {
+                            if (bullets[g].y == Enemy1X || bullets[g].y == Enemy1X + 1)
+                            {
+                                if (bullets[g].x == Enemy1Y + i)
+                                {
+                                    Enemy1X = 0;
+                                    Enemy1Y = int.MinValue;
+                                    speed2 -= 3;
+                                    bullets.RemoveAt(g);
+                                    g--;
+                                }
+
+                            }
+                        }
                     }
                 }
-
-
-                //Update
-
                 Console.Clear();
-
                 if (Enemy1Y == int.MinValue)
                 {
                     Enemy1Y = rand.Next(0, 34);
@@ -116,50 +157,15 @@ namespace ConsoleApplication8
                     Enemy1Y = int.MinValue;
                 }
 
-
-                
-
-                //Collision 
-
-                for (int i = 0; i <= 6; i++)
-                {
-                    if (PlayerY == Enemy1X)
-                    {
-                        if (PlayerX == Enemy1Y + i || PlayerX + 1 == Enemy1Y + i || PlayerX + 2 == Enemy1Y + i || PlayerX + 3 == Enemy1Y + i || PlayerX + 4 == Enemy1Y + i)
-                        {
-                            count = 0;
-                            speed = 0;
-                            break;
-                        }
-                    }
-
-                    if (Shoot1Y == Enemy1X || Shoot1Y == Enemy1X + 1)
-                    {
-                        if (Shoot1X == Enemy1Y + i )
-                        {
-                            Enemy1X = 0;
-                            Enemy1Y = int.MinValue;
-                            speed2 -= 3;
-                            Shoot1Y = PlayerY;
-                            Shoot1X = PlayerX;
-                        }
-                        
-                    }
-                }
-
-
-
-                
-
                 Console.SetCursorPosition(PlayerX, PlayerY);
                 Console.WriteLine("A");
                 Console.SetCursorPosition(1, 1);
-                Console.WriteLine("SCORE: " + count);
+                Console.WriteLine("Score: " + count);
                 Console.SetCursorPosition(1, 2);
                 Console.WriteLine("Max Score: " + maxscore);
-                Thread.Sleep(speed2);
+                Thread.Sleep(200);
 
-                
+
 
 
             }
